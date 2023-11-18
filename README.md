@@ -1,1 +1,0 @@
-# birbaner.github.io
