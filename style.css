@@ -200,7 +200,7 @@ p {
 
 /* Hero Section */
 #hero {
-	background-image: url("https://birbaner.github.io/img/istock-1193723992.webp");
+	background-image: url(./img/istock-1193723992.webp);
 	background-size: cover;
 	background-position: top center;
 	position: relative;
