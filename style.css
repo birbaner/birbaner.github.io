@@ -330,6 +330,27 @@ p {
 	color: white;
 	text-align: left;
 }
+#Portfolio .Portfolio-item ul {
+	margin: 0;
+	padding: 0;
+}
+
+#Portfolio .Portfolio-item ul li {
+	font-size: 12px;
+        margin-bottom: 10px;
+        color: white; /* Set text color to white */
+        position: relative;
+        padding-left: 20px; /* Adjust the spacing based on your design */
+}
+
+#Portfolio .Portfolio-item ul li::before {
+	content: "\2022"; /* Unicode character for a bullet point */
+        position: absolute;
+        left: 0;
+        color: white; /* Set bullet color to white */
+	font-size: 25px;
+}
+
 /* End Portfolio Section */
 
 /* Projects section */
