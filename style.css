@@ -336,7 +336,7 @@ p {
 
 #Portfolio .Portfolio-item ul li {
 	font-size: 12px;
-        margin-bottom: 50px;
+        margin-bottom: 100px;
         color: white; /* Set text color to white */
         position: relative;
         padding-left: 20px; /* Adjust the spacing based on your design */
@@ -348,6 +348,7 @@ p {
         left: 0;
         color: white; /* Set bullet color to white */
 	font-size: 25px;
+	marhin-bottom: 100px;
 }
 
 /* End Portfolio Section */
