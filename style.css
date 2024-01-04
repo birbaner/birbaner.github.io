@@ -326,11 +326,10 @@ p {
 	margin-bottom: 10px;
 	text-transform: uppercase;
 }
-#Portfolio .Portfolio-item p {
-	color: white;
-	text-align: left;
+
 }
 #Portfolio .Portfolio-item ul {
+	list-style: none; /* Remove default list styles */
 	margin: 0;
 	padding: 0;
 }
