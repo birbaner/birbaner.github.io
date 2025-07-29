@@ -2975,7 +2975,8 @@ Remove any cursor effects
     #header .nav-list ul {
         width: 100% !important;
         display: grid !important;
-        grid-template-columns: 1fr 1fr 1fr !important;
+        grid-template-columns: 1fr 1fr !important;
+        grid-template-rows: repeat(3, 1fr) !important;
         grid-gap: 3px !important;
         padding: 5px !important;
         margin: 0 !important;
@@ -3019,11 +3020,5 @@ Remove any cursor effects
         display: block !important;
         width: 100% !important;
         flex: none !important;
-    }
-    
-    /* Hide About and Skills navigation items on mobile - only show 4 items */
-    #header .nav-list ul li:nth-child(2),  /* About */
-    #header .nav-list ul li:nth-child(3) { /* Skills */
-        display: none !important;
     }
 }
