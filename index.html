@@ -533,153 +533,118 @@ document.addEventListener('DOMContentLoaded', function() {
     // After 3 seconds, hide intro and start role animation
     setTimeout(startRoleAnimation, 3000);
     
-    // Hamburger menu functionality with improved reliability
-    const hamburger = document.querySelector('.hamburger');
-    const navList = document.querySelector('.nav-list ul');
-    
-    if (hamburger && navList) {
-        hamburger.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            hamburger.classList.toggle('active');
-            navList.classList.toggle('active');
-            console.log('Hamburger toggled, active:', hamburger.classList.contains('active'));
-        });
+    // Single unified navigation system - no duplicates
+    // Clean, simple navigation solution that works for both mobile and desktop
+    function setupNavigation() {
+        console.log('Setting up navigation...');
         
-        // Close menu when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!hamburger.contains(e.target) && !navList.contains(e.target)) {
-                hamburger.classList.remove('active');
-                navList.classList.remove('active');
-            }
-        });
-    }
-    
-    // Ultra-robust mobile navigation - Direct approach with multiple fallbacks
-    function setupMobileNavigation() {
-        console.log('Setting up mobile navigation...');
+        const hamburger = document.querySelector('.hamburger');
+        const navList = document.querySelector('.nav-list ul');
+        const isMobile = window.innerWidth <= 480;
         
-        // Get all navigation links fresh each time
-        const getAllNavLinks = () => document.querySelectorAll('.nav-list ul li a');
+        console.log('Device type:', isMobile ? 'Mobile' : 'Desktop');
         
-        // Navigation handler function
-        window.navigateToSection = function(targetId, linkElement) {
-            console.log('Direct navigation called for:', targetId);
+        // Hamburger menu functionality (desktop only - mobile CSS hides it)
+        if (hamburger && navList) {
+            // Remove any existing listeners
+            const newHamburger = hamburger.cloneNode(true);
+            hamburger.parentNode.replaceChild(newHamburger, hamburger);
             
-            // Close hamburger menu immediately
-            const currentHamburger = document.querySelector('.hamburger');
-            const currentNavList = document.querySelector('.nav-list ul');
-            
-            if (currentHamburger) {
-                currentHamburger.classList.remove('active');
-                console.log('Hamburger closed via direct method');
-            }
-            if (currentNavList) {
-                currentNavList.classList.remove('active');
-                console.log('Nav list closed via direct method');
-            }
-            
-            // Find target section with multiple selectors
-            let targetSection = document.querySelector(targetId);
-            if (!targetSection && targetId.startsWith('#')) {
-                targetSection = document.getElementById(targetId.substring(1));
-            }
-            
-            if (targetSection) {
-                console.log('Found target section:', targetSection.id);
-                
-                // Calculate scroll position
-                const headerHeight = 80;
-                const targetPosition = targetSection.offsetTop - headerHeight;
-                console.log('Scrolling to position:', targetPosition);
-                
-                // Force immediate scroll for mobile reliability
-                window.scrollTo(0, targetPosition);
-                
-                // Optional smooth scroll attempt
-                setTimeout(() => {
-                    try {
-                        window.scrollTo({
-                            top: targetPosition,
-                            behavior: 'smooth'
-                        });
-                    } catch (e) {
-                        console.log('Smooth scroll not supported, using immediate scroll');
-                    }
-                }, 50);
-                
-            } else {
-                console.error('Target section not found:', targetId);
-            }
-        };
-        
-        // Setup navigation with both event listeners and onclick attributes
-        function bindNavigationEvents() {
-            const navLinks = getAllNavLinks();
-            console.log('Binding navigation to', navLinks.length, 'links');
-            
-            navLinks.forEach((link, index) => {
-                const targetId = link.getAttribute('href');
-                const linkText = link.textContent.trim();
-                
-                console.log(`Setting up link ${index + 1}: ${linkText} -> ${targetId}`);
-                
-                // Remove any existing event listeners by cloning the element
-                const newLink = link.cloneNode(true);
-                link.parentNode.replaceChild(newLink, link);
-                
-                // Method 1: Direct onclick attribute (most reliable for mobile)
-                newLink.setAttribute('onclick', `event.preventDefault(); event.stopPropagation(); window.navigateToSection('${targetId}', this); return false;`);
-                
-                // Method 2: Event listener as backup
-                newLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Event listener triggered for:', targetId);
-                    window.navigateToSection(targetId, this);
-                }, { passive: false });
-                
-                // Method 3: Touch events for mobile
-                newLink.addEventListener('touchend', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Touch event triggered for:', targetId);
-                    window.navigateToSection(targetId, this);
-                }, { passive: false });
+            newHamburger.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                newHamburger.classList.toggle('active');
+                navList.classList.toggle('active');
+                console.log('Hamburger toggled');
             });
-        }
-        
-        // Initial setup
-        bindNavigationEvents();
-        
-        // Re-bind on any DOM changes (in case something interferes)
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'childList' && mutation.target.classList && 
-                    mutation.target.classList.contains('nav-list')) {
-                    console.log('Navigation DOM changed, re-binding events');
-                    setTimeout(bindNavigationEvents, 100);
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!newHamburger.contains(e.target) && !navList.contains(e.target)) {
+                    newHamburger.classList.remove('active');
+                    navList.classList.remove('active');
                 }
             });
+        }
+        
+        // Navigation links functionality
+        const navLinks = document.querySelectorAll('.nav-list ul li a');
+        console.log('Found navigation links:', navLinks.length);
+        
+        navLinks.forEach((link, index) => {
+            const targetId = link.getAttribute('href');
+            const linkText = link.textContent.trim();
+            
+            console.log(`Link ${index + 1}: ${linkText} -> ${targetId}`);
+            
+            // Clean event handling - remove old listeners by cloning
+            const newLink = link.cloneNode(true);
+            link.parentNode.replaceChild(newLink, link);
+            
+            // Add click handler
+            newLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('Navigating to:', targetId);
+                
+                // Close hamburger menu if open
+                const currentHamburger = document.querySelector('.hamburger');
+                const currentNavList = document.querySelector('.nav-list ul');
+                if (currentHamburger && currentHamburger.classList.contains('active')) {
+                    currentHamburger.classList.remove('active');
+                    currentNavList.classList.remove('active');
+                    console.log('Closed hamburger menu');
+                }
+                
+                // Navigate to section
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    const headerHeight = 80;
+                    const targetPosition = targetSection.offsetTop - headerHeight;
+                    console.log('Scrolling to position:', targetPosition);
+                    
+                    // Use immediate scroll for reliability
+                    window.scrollTo(0, targetPosition);
+                    
+                    // Try smooth scroll as enhancement
+                    setTimeout(() => {
+                        try {
+                            window.scrollTo({
+                                top: targetPosition,
+                                behavior: 'smooth'
+                            });
+                        } catch (e) {
+                            console.log('Smooth scroll not supported');
+                        }
+                    }, 10);
+                } else {
+                    console.error('Target section not found:', targetId);
+                }
+            });
+            
+            // Add touch handler for mobile
+            newLink.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                newLink.click(); // Trigger the click handler
+            });
         });
         
-        const navContainer = document.querySelector('.nav-list');
-        if (navContainer) {
-            observer.observe(navContainer, { childList: true, subtree: true });
-        }
-        
-        console.log('Mobile navigation setup complete');
+        console.log('Navigation setup complete');
     }
     
-    // Setup navigation immediately and on any page changes
-    setupMobileNavigation();
+    // Setup navigation immediately
+    setupNavigation();
     
-    // Additional fallback - re-setup on hash changes or page visibility changes
-    window.addEventListener('hashchange', setupMobileNavigation);
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) {
-            setTimeout(setupMobileNavigation, 100);
-        }
+    // Re-setup on window resize to handle mobile/desktop transitions
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            console.log('Window resized, re-setting up navigation');
+            setupNavigation();
+        }, 250);
     });
 });
 
