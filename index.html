@@ -555,53 +555,107 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Simple and reliable navigation link handling
-    const navLinks = document.querySelectorAll('.nav-list ul li a');
-    console.log('Found navigation links:', navLinks.length); // Debug log
-    
-    navLinks.forEach((link, index) => {
-        console.log(`Link ${index + 1}:`, link.getAttribute('href'), link.textContent); // Debug log
+    // Enhanced mobile-compatible navigation with event delegation
+    function handleNavigation(e) {
+        // Check if clicked element is a navigation link
+        const link = e.target.closest('.nav-list ul li a');
+        if (!link) return;
         
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        
+        const targetId = link.getAttribute('href');
+        const linkText = link.textContent;
+        
+        console.log('Navigation clicked:', targetId, '- Text:', linkText); // Debug log
+        
+        // Close hamburger menu immediately
+        if (hamburger) {
+            hamburger.classList.remove('active');
+            console.log('Hamburger closed');
+        }
+        if (navList) {
+            navList.classList.remove('active');
+            console.log('Nav list closed');
+        }
+        
+        // Find target section
+        const targetSection = document.querySelector(targetId);
+        
+        if (targetSection) {
+            console.log('Found section:', targetSection.id); // Debug log
             
-            const targetId = this.getAttribute('href');
-            const linkText = this.textContent;
+            // Calculate position and scroll with mobile optimization
+            const headerHeight = document.querySelector('#header')?.offsetHeight || 100;
+            const targetPosition = targetSection.offsetTop - headerHeight;
+            console.log('Scrolling to position:', targetPosition); // Debug log
             
-            console.log('Clicked link:', targetId, '- Text:', linkText); // Debug log
-            
-            // Close hamburger menu immediately
-            if (hamburger) hamburger.classList.remove('active');
-            if (navList) navList.classList.remove('active');
-            
-            // Find target section
-            const targetSection = document.querySelector(targetId);
-            
-            if (targetSection) {
-                console.log('Found section:', targetSection.id); // Debug log
-                
-                // Calculate position and scroll
-                const targetPosition = targetSection.offsetTop - 100;
-                console.log('Scrolling to position:', targetPosition); // Debug log
-                
-                // Use requestAnimationFrame for smoother operation
-                requestAnimationFrame(() => {
+            // Multiple fallback methods for mobile compatibility
+            const scrollToTarget = () => {
+                try {
+                    // Method 1: Modern smooth scroll
                     window.scrollTo({
                         top: targetPosition,
                         behavior: 'smooth'
                     });
+                } catch (error) {
+                    console.log('Smooth scroll failed, using fallback:', error);
+                    // Method 2: Immediate scroll for older mobile browsers
+                    window.scrollTo(0, targetPosition);
+                }
+            };
+            
+            // Use multiple frame delays for better mobile performance
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    scrollToTarget();
                 });
-            } else {
-                console.log('Section not found for:', targetId); // Debug log
-                // List all available sections for debugging
-                const allSections = document.querySelectorAll('section[id]');
-                console.log('Available sections:');
-                allSections.forEach(section => {
-                    console.log('- Section ID:', section.id);
-                });
+            });
+            
+            // Additional mobile-specific delay
+            setTimeout(() => {
+                if (Math.abs(window.pageYOffset - targetPosition) > 50) {
+                    console.log('Scroll verification failed, retrying...');
+                    window.scrollTo(0, targetPosition);
+                }
+            }, 500);
+            
+        } else {
+            console.log('Section not found for:', targetId); // Debug log
+            // List all available sections for debugging
+            const allSections = document.querySelectorAll('section[id]');
+            console.log('Available sections:');
+            allSections.forEach(section => {
+                console.log('- Section ID:', section.id);
+            });
+        }
+    }
+    
+    // Use event delegation with multiple event types for mobile compatibility
+    document.addEventListener('click', handleNavigation, true);
+    document.addEventListener('touchend', handleNavigation, true);
+    
+    // Additional mobile-specific navigation setup
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    console.log('Mobile device detected:', isMobile);
+    
+    if (isMobile) {
+        // Mobile-specific optimizations
+        document.addEventListener('touchstart', function(e) {
+            const link = e.target.closest('.nav-list ul li a');
+            if (link) {
+                e.preventDefault();
+                console.log('Mobile touch detected on:', link.textContent);
             }
-        });
+        }, { passive: false });
+    }
+    
+    // Verify navigation links are properly set up
+    const navLinks = document.querySelectorAll('.nav-list ul li a');
+    console.log('Navigation setup complete. Found links:', navLinks.length);
+    navLinks.forEach((link, index) => {
+        console.log(`Link ${index + 1}:`, link.getAttribute('href'), link.textContent);
     });
 });
 
