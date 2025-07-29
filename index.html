@@ -538,17 +538,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const navList = document.querySelector('.nav-list ul');
     
     if (hamburger && navList) {
-        // Remove any existing event listeners
-        hamburger.removeEventListener('click', toggleHamburger);
-        hamburger.addEventListener('click', toggleHamburger);
-        
-        function toggleHamburger(e) {
+        hamburger.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             hamburger.classList.toggle('active');
             navList.classList.toggle('active');
             console.log('Hamburger toggled, active:', hamburger.classList.contains('active'));
-        }
+        });
         
         // Close menu when clicking outside
         document.addEventListener('click', function(e) {
@@ -559,67 +555,53 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Combined navigation link handling with improved reliability
+    // Simple and reliable navigation link handling
     const navLinks = document.querySelectorAll('.nav-list ul li a');
     console.log('Found navigation links:', navLinks.length); // Debug log
-    
-    // Function to ensure hamburger menu is properly closed
-    function closeHamburgerMenu() {
-        const hamburger = document.querySelector('.hamburger');
-        const navList = document.querySelector('.nav-list ul');
-        if (hamburger) hamburger.classList.remove('active');
-        if (navList) navList.classList.remove('active');
-    }
-    
-    // Function to handle navigation scrolling
-    function handleNavigation(targetId, linkText) {
-        console.log('Clicked link:', targetId, '- Text:', linkText); // Debug log
-        
-        // Close hamburger menu first
-        closeHamburgerMenu();
-        
-        const targetSection = document.querySelector(targetId);
-        
-        if (targetSection) {
-            console.log('Found section:', targetSection.id, targetSection); // Debug log
-            
-            // Wait a moment for menu to close, then scroll
-            setTimeout(() => {
-                const targetPosition = targetSection.offsetTop - 100;
-                console.log('Scrolling to position:', targetPosition); // Debug log
-                
-                // Scroll to position with offset
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-            }, 100);
-        } else {
-            console.log('Section not found for:', targetId); // Debug log
-            console.log('Available sections:'); // Debug log
-            const allSections = document.querySelectorAll('section[id]');
-            allSections.forEach(section => {
-                console.log('- Section ID:', section.id);
-            });
-        }
-    }
     
     navLinks.forEach((link, index) => {
         console.log(`Link ${index + 1}:`, link.getAttribute('href'), link.textContent); // Debug log
         
-        // Remove any existing event listeners and add fresh ones
-        link.removeEventListener('click', handleLinkClick);
-        link.addEventListener('click', handleLinkClick);
-        
-        function handleLinkClick(e) {
+        link.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             
             const targetId = this.getAttribute('href');
             const linkText = this.textContent;
             
-            handleNavigation(targetId, linkText);
-        }
+            console.log('Clicked link:', targetId, '- Text:', linkText); // Debug log
+            
+            // Close hamburger menu immediately
+            if (hamburger) hamburger.classList.remove('active');
+            if (navList) navList.classList.remove('active');
+            
+            // Find target section
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                console.log('Found section:', targetSection.id); // Debug log
+                
+                // Calculate position and scroll
+                const targetPosition = targetSection.offsetTop - 100;
+                console.log('Scrolling to position:', targetPosition); // Debug log
+                
+                // Use requestAnimationFrame for smoother operation
+                requestAnimationFrame(() => {
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                });
+            } else {
+                console.log('Section not found for:', targetId); // Debug log
+                // List all available sections for debugging
+                const allSections = document.querySelectorAll('section[id]');
+                console.log('Available sections:');
+                allSections.forEach(section => {
+                    console.log('- Section ID:', section.id);
+                });
+            }
+        });
     });
 });
 
