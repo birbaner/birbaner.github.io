@@ -21,13 +21,13 @@
           <div class="hamburger">
             <div class="bar"></div>
           </div>
-          <ul>
-            <li><a href="#hero" data-after="Home">Home</a></li>
-            <li><a href="#about" data-after="About">About</a></li>
-            <li><a href="#Portfolio" data-after="Skills">Skills</a></li>
-            <li><a href="#projects" data-after="Projects">Projects</a></li>
-            <li><a href="#experience" data-after="Experience">Experience</a></li>
-            <li><a href="#contact" data-after="Contact">Contact</a></li>
+          <ul class="mobile-nav-grid" style="display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 3px !important; width: 100% !important; padding: 5px !important;">
+            <li style="display: block !important;"><a href="#hero" data-after="Home" style="font-size: 0.7rem !important; padding: 6px 4px !important; text-align: center !important; background: rgba(255,255,255,0.8) !important; border: 1px solid rgba(220,20,60,0.2) !important; border-radius: 4px !important;">Home</a></li>
+            <li style="display: block !important;"><a href="#about" data-after="About" style="font-size: 0.7rem !important; padding: 6px 4px !important; text-align: center !important; background: rgba(255,255,255,0.8) !important; border: 1px solid rgba(220,20,60,0.2) !important; border-radius: 4px !important;">About</a></li>
+            <li style="display: block !important;"><a href="#Portfolio" data-after="Skills" style="font-size: 0.7rem !important; padding: 6px 4px !important; text-align: center !important; background: rgba(255,255,255,0.8) !important; border: 1px solid rgba(220,20,60,0.2) !important; border-radius: 4px !important;">Skills</a></li>
+            <li style="display: block !important;"><a href="#projects" data-after="Projects" style="font-size: 0.7rem !important; padding: 6px 4px !important; text-align: center !important; background: rgba(255,255,255,0.8) !important; border: 1px solid rgba(220,20,60,0.2) !important; border-radius: 4px !important;">Projects</a></li>
+            <li style="display: block !important;"><a href="#experience" data-after="Experience" style="font-size: 0.7rem !important; padding: 6px 4px !important; text-align: center !important; background: rgba(255,255,255,0.8) !important; border: 1px solid rgba(220,20,60,0.2) !important; border-radius: 4px !important;">Experience</a></li>
+            <li style="display: block !important;"><a href="#contact" data-after="Contact" style="font-size: 0.7rem !important; padding: 6px 4px !important; text-align: center !important; background: rgba(255,255,255,0.8) !important; border: 1px solid rgba(220,20,60,0.2) !important; border-radius: 4px !important;">Contact</a></li>
           </ul>
         </div>
       </div>
@@ -532,6 +532,24 @@ function startRoleAnimation() {
 document.addEventListener('DOMContentLoaded', function() {
     // After 3 seconds, hide intro and start role animation
     setTimeout(startRoleAnimation, 3000);
+    
+    // Hamburger menu functionality
+    const hamburger = document.querySelector('.hamburger');
+    const navList = document.querySelector('.nav-list ul');
+    
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navList.classList.toggle('active');
+    });
+    
+    // Close menu when clicking on a nav link
+    const navLinks = document.querySelectorAll('.nav-list ul li a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navList.classList.remove('active');
+        });
+    });
 });
 
 // Professional action button functions
