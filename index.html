@@ -533,118 +533,116 @@ document.addEventListener('DOMContentLoaded', function() {
     // After 3 seconds, hide intro and start role animation
     setTimeout(startRoleAnimation, 3000);
     
-    // Single unified navigation system - no duplicates
-    // Clean, simple navigation solution that works for both mobile and desktop
-    function setupNavigation() {
-        console.log('Setting up navigation...');
+    // SIMPLIFIED NAVIGATION SOLUTION
+    // Define global navigation function that works for all devices
+    window.navigateTo = function(targetId) {
+        console.log('navigateTo called for:', targetId);
         
+        try {
+            // Close mobile menu if it's open
+            const hamburger = document.querySelector('.hamburger');
+            const navList = document.querySelector('.nav-list ul');
+            if (hamburger && hamburger.classList.contains('active')) {
+                hamburger.classList.remove('active');
+                navList.classList.remove('active');
+                console.log('Closed mobile menu');
+            }
+            
+            // Find target section
+            const targetSection = document.querySelector(targetId);
+            if (targetSection) {
+                const headerHeight = 80;
+                const targetPosition = targetSection.offsetTop - headerHeight;
+                
+                console.log('Scrolling to:', targetId, 'at position:', targetPosition);
+                
+                // Use immediate scroll first for mobile compatibility
+                window.scrollTo(0, targetPosition);
+                
+                // Then try smooth scroll if supported
+                try {
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                } catch (smoothScrollError) {
+                    console.log('Smooth scroll not supported, using instant scroll');
+                }
+            } else {
+                console.error('Target section not found:', targetId);
+            }
+        } catch (err) {
+            console.error('Navigation error:', err);
+        }
+        
+        return false;
+    };
+    
+    // Setup hamburger menu only (nav links use onclick in HTML)
+    const setupMobileMenu = function() {
         const hamburger = document.querySelector('.hamburger');
         const navList = document.querySelector('.nav-list ul');
-        const isMobile = window.innerWidth <= 480;
         
-        console.log('Device type:', isMobile ? 'Mobile' : 'Desktop');
-        
-        // Hamburger menu functionality (desktop only - mobile CSS hides it)
         if (hamburger && navList) {
-            // Remove any existing listeners
-            const newHamburger = hamburger.cloneNode(true);
-            hamburger.parentNode.replaceChild(newHamburger, hamburger);
-            
-            newHamburger.addEventListener('click', function(e) {
+            hamburger.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                newHamburger.classList.toggle('active');
+                
+                hamburger.classList.toggle('active');
                 navList.classList.toggle('active');
-                console.log('Hamburger toggled');
+                console.log('Hamburger menu toggled');
             });
             
             // Close menu when clicking outside
             document.addEventListener('click', function(e) {
-                if (!newHamburger.contains(e.target) && !navList.contains(e.target)) {
-                    newHamburger.classList.remove('active');
+                if (!hamburger.contains(e.target) && !navList.contains(e.target)) {
+                    hamburger.classList.remove('active');
                     navList.classList.remove('active');
                 }
             });
         }
+    };
+    
+    // Initialize mobile menu
+    setupMobileMenu();
+    
+    // This ensures all nav links use our global navigateTo function
+    // This works in both desktop and mobile
+    document.querySelectorAll('.nav-list ul li a').forEach(link => {
+        const sectionId = link.getAttribute('href');
         
-        // Navigation links functionality
-        const navLinks = document.querySelectorAll('.nav-list ul li a');
-        console.log('Found navigation links:', navLinks.length);
+        // Remove any existing event listeners by cloning the element
+        const newLink = link.cloneNode(true);
+        link.parentNode.replaceChild(newLink, link);
         
-        navLinks.forEach((link, index) => {
-            const targetId = link.getAttribute('href');
-            const linkText = link.textContent.trim();
-            
-            console.log(`Link ${index + 1}: ${linkText} -> ${targetId}`);
-            
-            // Clean event handling - remove old listeners by cloning
-            const newLink = link.cloneNode(true);
-            link.parentNode.replaceChild(newLink, link);
-            
-            // Add click handler
-            newLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                console.log('Navigating to:', targetId);
-                
-                // Close hamburger menu if open
-                const currentHamburger = document.querySelector('.hamburger');
-                const currentNavList = document.querySelector('.nav-list ul');
-                if (currentHamburger && currentHamburger.classList.contains('active')) {
-                    currentHamburger.classList.remove('active');
-                    currentNavList.classList.remove('active');
-                    console.log('Closed hamburger menu');
-                }
-                
-                // Navigate to section
-                const targetSection = document.querySelector(targetId);
-                if (targetSection) {
-                    const headerHeight = 80;
-                    const targetPosition = targetSection.offsetTop - headerHeight;
-                    console.log('Scrolling to position:', targetPosition);
-                    
-                    // Use immediate scroll for reliability
-                    window.scrollTo(0, targetPosition);
-                    
-                    // Try smooth scroll as enhancement
-                    setTimeout(() => {
-                        try {
-                            window.scrollTo({
-                                top: targetPosition,
-                                behavior: 'smooth'
-                            });
-                        } catch (e) {
-                            console.log('Smooth scroll not supported');
-                        }
-                    }, 10);
-                } else {
-                    console.error('Target section not found:', targetId);
-                }
-            });
-            
-            // Add touch handler for mobile
-            newLink.addEventListener('touchend', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                newLink.click(); // Trigger the click handler
-            });
+        // Add click handler for desktop and mobile
+        newLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Click event for:', sectionId);
+            navigateTo(sectionId);
+            return false;
         });
         
-        console.log('Navigation setup complete');
-    }
-    
-    // Setup navigation immediately
-    setupNavigation();
-    
-    // Re-setup on window resize to handle mobile/desktop transitions
-    let resizeTimer;
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function() {
-            console.log('Window resized, re-setting up navigation');
-            setupNavigation();
-        }, 250);
+        // Add specific touch handler for mobile devices
+        newLink.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Touch start for:', sectionId);
+        });
+        
+        newLink.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Touch end for:', sectionId);
+            
+            // Small delay to ensure touch is registered
+            setTimeout(() => {
+                navigateTo(sectionId);
+            }, 50);
+            
+            return false;
+        });
     });
 });
 
