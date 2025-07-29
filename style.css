@@ -2962,13 +2962,14 @@ Remove any cursor effects
     
     #header .brand h1 {
         font-size: 1.8rem !important;
-        margin-bottom: 8px !important;
+        margin-bottom: 2px !important;
     }
     
     #header .nav-list {
         width: 100% !important;
         padding: 0 !important;
         margin: 0 !important;
+        margin-top: -5px !important;
     }
     
     #header .nav-list ul {
@@ -3018,5 +3019,11 @@ Remove any cursor effects
         display: block !important;
         width: 100% !important;
         flex: none !important;
+    }
+    
+    /* Hide About and Skills navigation items on mobile - only show 4 items */
+    #header .nav-list ul li:nth-child(2),  /* About */
+    #header .nav-list ul li:nth-child(3) { /* Skills */
+        display: none !important;
     }
 }
